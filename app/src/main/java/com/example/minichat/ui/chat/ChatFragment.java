@@ -11,15 +11,32 @@ import android.widget.SimpleAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
+import com.example.minichat.MyApplication;
 import com.example.minichat.R;
+import com.example.minichat.constant.constant;
 import com.example.minichat.databinding.FragmentChatBinding;
 import com.example.minichat.entity.Chat;
+import com.example.minichat.user.LoginActivity;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class ChatFragment extends Fragment implements View.OnClickListener {
 
@@ -27,7 +44,15 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     private ListView lv_chat;
     private List<Map<String, Object>> chatList;
     private ImageView iv_create;
+    private int[] avatar = {
+      R.drawable.avatar0, R.drawable.avatar1, R.drawable.avatar2, R.drawable.avatar3,
+      R.drawable.avatar4, R.drawable.avatar5, R.drawable.avatar6, R.drawable.avatar7
+    };
+    private MutableLiveData<List<Chat>> chatsLiveData = new MutableLiveData<>();
 
+    public LiveData<List<Chat>> getChatsLiveData() {
+        return chatsLiveData;
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,22 +71,14 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     }
 
     private void initData() {
-        List<Chat> chats = new ArrayList<>();
-        chats.add(new Chat(0, "九月", "我是你的朋友九月", R.drawable.avatar0, 1));
-        chats.add(new Chat(0, "十一月", "我是你的朋友十一月", R.drawable.avatar1, 1));
-        chats.add(new Chat(0, "九月", "我是你的朋友九月", R.drawable.avatar0, 1));
-        chats.add(new Chat(0, "十一月", "我是你的朋友十一月", R.drawable.avatar1, 1));
-        chats.add(new Chat(0, "九月", "我是你的朋友九月", R.drawable.avatar0, 1));
-        chats.add(new Chat(0, "十一月", "我是你的朋友十一月", R.drawable.avatar1, 1));
-        chats.add(new Chat(0, "九月", "我是你的朋友九月", R.drawable.avatar0, 1));
-        chats.add(new Chat(0, "十一月", "我是你的朋友十一月", R.drawable.avatar1, 1));
-        chats.add(new Chat(0, "九月", "我是你的朋友九月", R.drawable.avatar0, 1));
-        chats.add(new Chat(0, "十一月", "我是你的朋友十一月", R.drawable.avatar1, 1));
-        chats.add(new Chat(0, "九月", "我是你的朋友九月", R.drawable.avatar0, 1));
-        chats.add(new Chat(0, "十一月", "我是你的朋友十一月", R.drawable.avatar1, 1));
-        chats.add(new Chat(0, "九月", "我是你的朋友九月", R.drawable.avatar0, 1));
-        chats.add(new Chat(0, "十一月", "我是你的朋友十一月", R.drawable.avatar1, 1));
-        updateUI(chats);
+        fetchData();
+        this.getChatsLiveData().observe(getViewLifecycleOwner(), chats -> {
+            if (chats != null && !chats.isEmpty()) {
+                updateUI(chats);
+            } else {
+                lv_chat.removeAllViews();
+            }
+        });
     }
 
 
@@ -71,7 +88,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
             Map<String, Object> map = new HashMap<>();
             map.put("name", chat.name);
             map.put("decs", chat.desc);
-            map.put("avatar", chat.avatar);
+            map.put("avatar", avatar[chat.avatar]);
             chatList.add(map);
         }
 
@@ -116,5 +133,47 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
             Intent intent = new Intent(getContext(), CreateAiActivity.class);
             startActivity(intent);
         }
+    }
+
+    private void fetchData(){
+        List<Chat> chatData = new ArrayList<>();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(constant.IP_ADDRESS + "/user/getrobots")
+                .header("Authorization", Objects.requireNonNull(MyApplication.getInstance().infoMap.get("token")))
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseBody = response.body().string();
+                JsonObject jsonObject = new Gson().fromJson(responseBody, JsonObject.class);
+                if (response.isSuccessful()) {
+                    if(response.code() == 401){
+                        // token已过期，需要重新登录
+                        Intent intent = new Intent(getContext(), LoginActivity.class);
+                        intent.putExtra("validate_token", false);
+                        startActivity(intent);
+                    }else {
+                        int code = jsonObject.get("code").getAsInt();
+                        if (code == 200) {
+                            Gson gson = new Gson();
+                            Chat[] chats = gson.fromJson(jsonObject.get("data").getAsJsonArray(), Chat[].class);
+                            chatData.addAll(Arrays.asList(chats));
+                            chatsLiveData.postValue(chatData);
+                        }
+                    }
+                }
+            }
+        });
     }
 }

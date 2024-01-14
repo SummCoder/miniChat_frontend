@@ -44,7 +44,12 @@ public class LoginActivity  extends AppCompatActivity implements View.OnFocusCha
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        Intent intent = getIntent();
+        boolean validate_token = intent.getBooleanExtra("validate_token", true);
         showLoginDialog();
+        if(!validate_token){
+            Toast.makeText(LoginActivity.this, "登录会话超时，请重新登录", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void showLoginDialog() {

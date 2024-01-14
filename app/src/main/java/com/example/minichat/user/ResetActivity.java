@@ -52,12 +52,12 @@ public class ResetActivity extends AppCompatActivity implements View.OnClickList
             Toast.makeText(this, "两次输入密码不一致", Toast.LENGTH_SHORT).show();
             return;
         }
-        boolean isReset = UserUtil.reset(reset_password_first);
+        boolean isReset = UserUtil.reset(this, reset_password_first);
         if(isReset){
             Toast.makeText(this, "修改密码成功！", Toast.LENGTH_SHORT).show();
             finish();
         }else {
-            Toast.makeText(this, "密码修改失败", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "密码修改失败！", Toast.LENGTH_SHORT).show();
         }
     }
 }

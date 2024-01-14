@@ -1,7 +1,12 @@
 package com.example.minichat.utils;
 
+import android.content.Context;
+import android.content.Intent;
+
 import com.example.minichat.MyApplication;
 import com.example.minichat.constant.constant;
+import com.example.minichat.user.LoginActivity;
+import com.example.minichat.user.RegisterActivity;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -137,7 +142,7 @@ public class UserUtil {
         return isLoggedIn;
     }
 
-    public static boolean reset(String password) {
+    public static boolean reset(Context ctx, String password) {
         isReset = false;
         Thread thread = new Thread(() -> {
             OkHttpClient client = new OkHttpClient.Builder()
@@ -171,11 +176,18 @@ public class UserUtil {
                 throw new RuntimeException(e);
             }
             JsonObject jsonObject = new Gson().fromJson(responseBody, JsonObject.class);
-            int code = jsonObject.get("code").getAsInt();
-            if (code == 200){
-                isReset = true;
-            } else if (code == 400) {
-                isReset = false;
+            if(response.code() == 401){
+                // token已过期，需要重新登录
+                Intent intent = new Intent(ctx, LoginActivity.class);
+                intent.putExtra("validate_token", false);
+                ctx.startActivity(intent);
+            }else {
+                int code = jsonObject.get("code").getAsInt();
+                if (code == 200){
+                    isReset = true;
+                } else if (code == 400) {
+                    isReset = false;
+                }
             }
         });
         thread.start();

@@ -29,6 +29,8 @@
         <activity android:name=".user.LoginActivity"/>
         <activity android:name=".user.RegisterActivity"/>
         <activity android:name=".user.ResetActivity"/>
+        <activity android:name=".ui.chat.ChatDetailActivity"/>
+        <activity android:name=".ui.chat.CreateAiActivity"/>
     </application>
 
 </manifest>

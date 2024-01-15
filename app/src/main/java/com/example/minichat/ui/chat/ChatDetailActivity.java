@@ -183,7 +183,7 @@ public class ChatDetailActivity extends AppCompatActivity implements View.OnClic
 
             RequestBody requestBody = RequestBody.create(JSON, gson.toJson(params));
             Request request = new Request.Builder()
-                    .url("http://10.58.0.2:8000/v1/chat/completions")
+                    .url("http://xxx:8000/v1/chat/completions")
                     .post(requestBody)
                     .addHeader("Content-Type", "application/json")
                     .build();

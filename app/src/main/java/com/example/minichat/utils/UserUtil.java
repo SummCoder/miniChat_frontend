@@ -73,8 +73,10 @@ public class UserUtil {
                 // 登录成功
                 isLoggedIn = true;
                 String Authorization = jsonObject.get("data").getAsString();
+                String userid = jsonObject.get("userid").getAsString();
                 MyApplication app = MyApplication.getInstance();
                 app.infoMap.put("token", Authorization);
+                app.infoMap.put("userid", userid);
             } else if (code == 999) {
                 isLoggedIn = false;
             }
@@ -127,8 +129,10 @@ public class UserUtil {
                 // 登录成功
                 isLoggedIn = true;
                 String Authorization = jsonObject.get("data").getAsString();
+                String userid = jsonObject.get("userid").getAsString();
                 MyApplication app = MyApplication.getInstance();
                 app.infoMap.put("token", Authorization);
+                app.infoMap.put("userid", userid);
             } else if (code == 999) {
                 isLoggedIn = false;
             }

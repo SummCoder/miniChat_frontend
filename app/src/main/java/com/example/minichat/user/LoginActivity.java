@@ -146,7 +146,7 @@ public class LoginActivity  extends AppCompatActivity implements View.OnFocusCha
     protected void onStop() {
         super.onStop();
         // 关闭数据库连接
-        mHelper.closeLink();
+//        mHelper.closeLink();
     }
 
     // 进入页面时加载数据库中存储的用户名和密码

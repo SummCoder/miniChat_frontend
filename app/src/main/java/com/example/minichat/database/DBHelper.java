@@ -6,7 +6,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.minichat.MyApplication;
 import com.example.minichat.entity.LoginInfo;
+import com.example.minichat.entity.Msg;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author SummCoder
@@ -70,6 +75,14 @@ public class DBHelper extends SQLiteOpenHelper {
                 " password VARCHAR NOT NULL," +
                 " remember INTEGER NOT NULL);";
         sqLiteDatabase.execSQL(sql_login);
+
+        String chat_sql = "CREATE TABLE IF NOT EXISTS " + "chat_info" + " (" +
+                "_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                " robot_id INTEGER NOT NULL," +
+                " user_id INTEGER NOT NULL," +
+                " role INTEGER NOT NULL," +
+                " chat_content TEXT NOT NULL);";
+        sqLiteDatabase.execSQL(chat_sql);
     }
 
     // 更新数据库版本
@@ -130,5 +143,18 @@ public class DBHelper extends SQLiteOpenHelper {
             info.remember = cursor.getInt(3) != 0;
         }
         return info;
+    }
+
+    public List<Msg> queryByUserAndRobot(int robotId){
+        List<Msg> msgList = new ArrayList<>();
+        String selection = "robot_id = ? AND user_id = ?";
+        String[] selectionArgs = { String.valueOf(robotId), MyApplication.getInstance().infoMap.get("userid")};
+        Cursor cursor = mRDB.query("chat_info", null, selection, selectionArgs, null, null, null);
+        while(cursor.moveToNext()){
+            Msg msg = new Msg(cursor.getString(4), cursor.getInt(3));
+            msgList.add(msg);
+        }
+        cursor.close();
+        return msgList;
     }
 }

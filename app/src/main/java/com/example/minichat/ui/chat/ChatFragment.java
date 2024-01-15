@@ -20,6 +20,7 @@ import com.example.minichat.constant.constant;
 import com.example.minichat.databinding.FragmentChatBinding;
 import com.example.minichat.entity.Chat;
 import com.example.minichat.user.LoginActivity;
+import com.example.minichat.utils.UserUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -67,7 +68,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        initData();
+        if(UserUtil.isLoggedIn()){
+            initData();
+        }
     }
 
     private void initData() {
@@ -75,12 +78,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         this.getChatsLiveData().observe(getViewLifecycleOwner(), chats -> {
             if (chats != null && !chats.isEmpty()) {
                 updateUI(chats);
-            } else {
-                lv_chat.removeAllViews();
             }
         });
     }
-
 
     private void updateUI(List<Chat> chats) {
         chatList = new ArrayList<>();

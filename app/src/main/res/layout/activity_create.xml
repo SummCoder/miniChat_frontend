@@ -182,6 +182,7 @@
                         android:inputType="textMultiLine"
                         android:layout_marginStart="12dp"
                         android:maxLines="5"
+                        android:hint="请按照你叫xxx作为开头，并为其补充一些你想要的设定，祝您玩的开心😀"
                         android:gravity="top"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

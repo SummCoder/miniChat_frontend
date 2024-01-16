@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.minichat.R;
-import com.example.minichat.database.DBHelper;
 import com.example.minichat.entity.Msg;
 
 import java.util.List;

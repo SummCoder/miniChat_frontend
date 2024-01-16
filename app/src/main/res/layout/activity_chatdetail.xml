@@ -34,7 +34,8 @@
             android:scaleType="centerCrop"/>
         <TextView
             android:id="@+id/tv_robotName"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="30dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
@@ -42,13 +43,20 @@
             android:textStyle="bold"
             android:textSize="18sp"
             android:text="空白" />
+        <ImageView
+            android:id="@+id/iv_more"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="15dp"
+            android:src="@drawable/ic_more"/>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
     <LinearLayout
         android:layout_width="match_parent"

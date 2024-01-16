@@ -84,7 +84,11 @@ public class CreateAiActivity extends AppCompatActivity implements View.OnClickL
         if(view.getId() == R.id.iv_cancel){
             finish();
         } else if (view.getId() == R.id.tv_complete) {
-            createRobot();
+            if(!et_createName.getText().toString().equals("") && !et_createDesc.getText().toString().equals("")){
+                createRobot();
+            }else {
+                Toast.makeText(this, "请补充完整名称和描述！", Toast.LENGTH_SHORT).show();
+            }
         } else if (view.getId() == R.id.iv_avatar0) {
             avatarNum = 0;
             iv_createAvatar.setImageResource(R.drawable.avatar0);

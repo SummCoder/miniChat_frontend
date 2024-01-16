@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
     <EditText
-        android:id="@+id/et_search"
+        android:id="@+id/et_search1"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginStart="10dp"
@@ -18,15 +18,8 @@
         android:maxLines="1"
         android:singleLine="true" />
 
-
-
-<!--    <ListView-->
-<!--        android:id="@+id/lv_publicRobot"-->
-<!--        android:layout_margin="5dp"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent" />-->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_publicRobot"
+        android:id="@+id/rv_searchRobot"
         android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

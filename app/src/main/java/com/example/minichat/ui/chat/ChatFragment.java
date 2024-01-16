@@ -77,7 +77,10 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         fetchData();
         this.getChatsLiveData().observe(getViewLifecycleOwner(), chats -> {
             if (chats != null && !chats.isEmpty()) {
+                lv_chat.setVisibility(View.VISIBLE);
                 updateUI(chats);
+            }else {
+                lv_chat.setVisibility(View.GONE);
             }
         });
     }
@@ -115,7 +118,12 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
 
     private void navigateToChatDetail(Chat chat) {
         Intent intent = new Intent(getContext(), ChatDetailActivity.class);
-        intent.putExtra("chatInfo", chat.id);
+        Bundle bundle = new Bundle();
+        bundle.putInt("chatId", chat.id);
+        bundle.putInt("avatar", chat.avatar);
+        bundle.putString("name", chat.name);
+        bundle.putString("desc", chat.desc);
+        intent.putExtra("chatInfo", bundle);
         startActivity(intent);
     }
 
@@ -136,44 +144,46 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     }
 
     private void fetchData(){
-        List<Chat> chatData = new ArrayList<>();
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .build();
+        new Thread(() -> {
+            List<Chat> chatData = new ArrayList<>();
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .writeTimeout(30, TimeUnit.SECONDS)
+                    .build();
 
-        Request request = new Request.Builder()
-                .url(constant.IP_ADDRESS + "/user/getrobots")
-                .header("Authorization", Objects.requireNonNull(MyApplication.getInstance().infoMap.get("token")))
-                .build();
+            Request request = new Request.Builder()
+                    .url(constant.IP_ADDRESS + "/user/getrobots")
+                    .header("Authorization", Objects.requireNonNull(MyApplication.getInstance().infoMap.get("token")))
+                    .build();
 
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responseBody = response.body().string();
-                JsonObject jsonObject = new Gson().fromJson(responseBody, JsonObject.class);
-                if (response.isSuccessful()) {
-                    if(response.code() == 401){
-                        // token已过期，需要重新登录
-                        Intent intent = new Intent(getContext(), LoginActivity.class);
-                        intent.putExtra("validate_token", false);
-                        startActivity(intent);
-                    }else {
-                        int code = jsonObject.get("code").getAsInt();
-                        if (code == 200) {
-                            Gson gson = new Gson();
-                            Chat[] chats = gson.fromJson(jsonObject.get("data").getAsJsonArray(), Chat[].class);
-                            chatData.addAll(Arrays.asList(chats));
-                            chatsLiveData.postValue(chatData);
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    e.printStackTrace();
+                }
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String responseBody = response.body().string();
+                    JsonObject jsonObject = new Gson().fromJson(responseBody, JsonObject.class);
+                    if (response.isSuccessful()) {
+                        if(response.code() == 401){
+                            // token已过期，需要重新登录
+                            Intent intent = new Intent(getContext(), LoginActivity.class);
+                            intent.putExtra("validate_token", false);
+                            startActivity(intent);
+                        }else {
+                            int code = jsonObject.get("code").getAsInt();
+                            if (code == 200) {
+                                Gson gson = new Gson();
+                                Chat[] chats = gson.fromJson(jsonObject.get("data").getAsJsonArray(), Chat[].class);
+                                chatData.addAll(Arrays.asList(chats));
+                                chatsLiveData.postValue(chatData);
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
+        }).start();
     }
 }

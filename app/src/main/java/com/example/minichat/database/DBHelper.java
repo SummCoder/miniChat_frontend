@@ -99,6 +99,15 @@ public class DBHelper extends SQLiteOpenHelper {
         return mWDB.insert("login_info", null, values);
     }
 
+    public long insertChat(int robot_id, int role, String chat_content){
+        ContentValues values = new ContentValues();
+        values.put("robot_id", robot_id);
+        values.put("user_id", MyApplication.getInstance().infoMap.get("userid"));
+        values.put("role", role);
+        values.put("chat_content", chat_content);
+        return mWDB.insert("chat_info", null, values);
+    }
+
     // 保存或更新原来保存的密码
     public void saveLoginInfo(LoginInfo info){
         try {
@@ -115,6 +124,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public long deleteLoginInfo(LoginInfo info){
         return mWDB.delete("login_info", "username=?", new String[]{info.username});
+    }
+
+    public long deleteMsg(int robotId){
+        String selection = "robot_id = ? AND user_id = ?";
+        String[] selectionArgs = { String.valueOf(robotId), MyApplication.getInstance().infoMap.get("userid")};
+        return mWDB.delete("chat_info", selection, selectionArgs);
     }
 
     // 读取最后一条添加用户名及密码

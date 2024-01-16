@@ -31,6 +31,8 @@
         <activity android:name=".user.ResetActivity"/>
         <activity android:name=".ui.chat.ChatDetailActivity"/>
         <activity android:name=".ui.chat.CreateAiActivity"/>
+        <activity android:name=".ui.chat.DescriptionActivity"/>
+        <activity android:name=".ui.search.SearchActivity"/>
     </application>
 
 </manifest>

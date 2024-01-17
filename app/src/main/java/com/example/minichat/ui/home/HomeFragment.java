@@ -21,19 +21,26 @@ import com.example.minichat.utils.UserUtil;
 public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private FragmentHomeBinding binding;
+    private TextView tv_userName;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        TextView tv_userName = root.findViewById(R.id.tv_userName);
+        tv_userName = root.findViewById(R.id.tv_userName);
         tv_userName.setText(MyApplication.getInstance().infoMap.get("username"));
         TextView tv_editPassword = root.findViewById(R.id.tv_editPassword);
         tv_editPassword.setOnClickListener(this);
         Button btn_logout = root.findViewById(R.id.btn_logout);
         btn_logout.setOnClickListener(this);
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        tv_userName.setText(MyApplication.getInstance().infoMap.get("username"));
     }
 
     @Override
